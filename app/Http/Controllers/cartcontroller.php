@@ -6,32 +6,7 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    // ✅ Local product data (same as ProductController)
-    private function products()
-    {
-        return [
-            [
-                'slug' => 'luxury-chocolate-box',
-                'name' => 'Luxury Chocolate Box',
-                'price' => 2500,
-                'image' => 'luxury-chocolate-box.jpg',
-            ],
-            [
-                'slug' => 'flower-bouquet-roses',
-                'name' => 'Rose Bouquet',
-                'price' => 3200,
-                'image' => 'rose-bouquet.jpg',
-            ],
-            [
-                'slug' => 'personalized-mug',
-                'name' => 'Personalized Mug',
-                'price' => 900,
-                'image' => 'personalized-mug.jpg',
-            ],
-        ];
-    }
-
-    // ✅ Show cart page
+    //  Show cart
     public function index()
     {
         $cart = session()->get('cart', []);
@@ -39,10 +14,12 @@ class CartController extends Controller
         return view('cart.index', compact('cart', 'total'));
     }
 
-    // ✅ Add product to cart (by slug)
+    //  Add product to cart
     public function add(Request $request, $slug)
     {
-        $product = collect($this->products())->firstWhere('slug', $slug);
+        //  Get all products from ProductController
+        $products = (new ProductController())->allProducts();
+        $product = collect($products)->firstWhere('slug', $slug);
 
         if (!$product) {
             return redirect()->back()->with('error', 'Product not found!');
@@ -62,72 +39,67 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
-
-        return redirect()->route('cart.index')->with('success', 'Product added to cart!');
+        return redirect()->route('cart.index')->with('success', '✅ Product added to cart!');
     }
 
-    // ✅ Remove one item
-    public function remove($slug)
+    // 🔼 Update quantity (increase/decrease)
+    public function update(Request $request, $slug)
     {
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$slug])) {
-            unset($cart[$slug]);
-            session()->put('cart', $cart);
+        if (!isset($cart[$slug])) {
+            return redirect()->back()->with('error', 'Item not found in cart!');
         }
 
-        return redirect()->route('cart.index')->with('success', 'Item removed!');
+        if ($request->action === 'increase') {
+            $cart[$slug]['quantity']++;
+        } elseif ($request->action === 'decrease') {
+            $cart[$slug]['quantity']--;
+            if ($cart[$slug]['quantity'] <= 0) {
+                unset($cart[$slug]);
+            }
+        }
+
+        session()->put('cart', $cart);
+        return redirect()->back()->with('success', 'Cart updated!');
     }
 
-    // ✅ Clear all items
+    // ❌ Remove one item
+    public function remove($slug)
+    {
+        $cart = session()->get('cart', []);
+        if (isset($cart[$slug])) {
+            unset($cart[$slug]);
+        }
+        session()->put('cart', $cart);
+        return redirect()->back()->with('success', 'Item removed!');
+    }
+
+    // 🧹 Clear all
     public function clear()
     {
         session()->forget('cart');
-        return redirect()->route('cart.index')->with('success', 'Cart cleared!');
+        return redirect()->back()->with('success', 'Cart cleared!');
     }
 
-    // ✅ Checkout page
+    // 💳 Checkout page
     public function checkout()
     {
         $cart = session()->get('cart', []);
         $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
-
         return view('cart.checkout', compact('cart', 'total'));
     }
 
+    // ✅ Fake checkout process
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email',
+            'address' => 'required|string|max:255',
+        ]);
 
-    public function update(Request $request, $id)
-{
-    $cart = session()->get('cart', []);
-
-    if (isset($cart[$id])) {
-        if ($request->action === 'increase') {
-            $cart[$id]['quantity']++;
-        } elseif ($request->action === 'decrease' && $cart[$id]['quantity'] > 1) {
-            $cart[$id]['quantity']--;
-        }
-        session()->put('cart', $cart);
+        session()->forget('cart');
+        return redirect()->route('cart.checkout')->with('success', '🎉 Order placed successfully!');
     }
-
-    return redirect()->back()->with('success', 'Cart updated successfully!');
-}
-
-
-public function processCheckout(Request $request)
-{
-    $request->validate([
-        'name' => 'required',
-        'email' => 'required|email',
-        'address' => 'required',
-    ]);
-
-    // ✅ Clear cart after checkout
-    session()->forget('cart');
-
-    // ✅ Return with success message
-    return redirect()->back()->with('success', '🎉 Thank you! Your order has been confirmed.');
-}
-
-
-   
 }

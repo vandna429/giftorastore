@@ -27,6 +27,11 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
+        Schema::table('users', function (Blueprint $table) {
+    $table->boolean('is_admin')->default(0)->after('password');
+});
+
+
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();

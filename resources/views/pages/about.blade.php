@@ -86,11 +86,6 @@
         </div>
     </div>
 
-    <div class="mt-5 text-center">
-        <h4 class="fw-bold mb-3">Contact Us</h4>
-        <p><i class="bi bi-envelope-fill text-primary"></i> <strong>Email:</strong> support@giftora.com</p>
-        <p><i class="bi bi-telephone-fill text-primary"></i> <strong>Phone:</strong> +92 300 1234567</p>
-        <p><i class="bi bi-geo-alt-fill text-primary"></i> <strong>Address:</strong> Giftora HQ, Clifton Block 5, Karachi, Pakistan</p>
-    </div>
+    
 </div>
 @endsection

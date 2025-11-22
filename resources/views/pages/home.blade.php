@@ -14,33 +14,50 @@
     </div>
 </div>
 
-<!-- ✅ Your Existing Content Starts Here -->
+<!-- ✅ Popular Categories Section -->
 <div class="py-5">
     <hr class="my-5">
 
     <h2 class="text-center mb-4">Popular Categories</h2>
     <div class="d-flex justify-content-center flex-wrap gap-4">
 
-        <div class="card p-3 text-center" style="width: 200px;">
-            <img src="{{ asset('images/chocolates-icon.jpg') }}" alt="Chocolates" class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
-            <h6 class="fw-semibold">Chocolates</h6>
-        </div>
+        <!-- Chocolates -->
+        <a href="{{ route('products.index', ['category' => 'chocolates']) }}" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center shadow-sm" style="width: 200px;">
+                <img src="{{ asset('images/chocolates-icon.jpg') }}" alt="Chocolates" 
+                     class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
+                <h6 class="fw-semibold">Chocolates</h6>
+            </div>
+        </a>
 
-        <div class="card p-3 text-center" style="width: 200px;">
-            <img src="{{ asset('images/roses-icon.jpg') }}" alt="Roses" class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
-            <h6 class="fw-semibold">Roses</h6>
-        </div>
+        <!-- Roses -->
+        <a href="{{ route('products.index', ['category' => 'roses']) }}" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center shadow-sm" style="width: 200px;">
+                <img src="{{ asset('images/roses-icon.jpg') }}" alt="Roses" 
+                     class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
+                <h6 class="fw-semibold">Roses</h6>
+            </div>
+        </a>
 
-        <div class="card p-3 text-center" style="width: 200px;">
-            <img src="{{ asset('images/candles-icon.jpg') }}" alt="Candles" class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
-            <h6 class="fw-semibold">Candles</h6>
-        </div>
+        <!-- Candles -->
+        <a href="{{ route('products.index', ['category' => 'candles']) }}" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center shadow-sm" style="width: 200px;">
+                <img src="{{ asset('images/candles-icon.jpg') }}" alt="Candles" 
+                     class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
+                <h6 class="fw-semibold">Candles</h6>
+            </div>
+        </a>
 
-        <div class="card p-3 text-center" style="width: 200px;">
-            <img src="{{ asset('images/mugs-icon.jpg') }}" alt="Mugs" class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
-            <h6 class="fw-semibold">Mugs</h6>
-        </div>
+        <!-- Mugs -->
+        <a href="{{ route('products.index', ['category' => 'mugs']) }}" class="text-decoration-none text-dark">
+            <div class="card p-3 text-center shadow-sm" style="width: 200px;">
+                <img src="{{ asset('images/mugs-icon.jpg') }}" alt="Mugs" 
+                     class="img-fluid mb-2" style="height: 90px; object-fit: contain;">
+                <h6 class="fw-semibold">Mugs</h6>
+            </div>
+        </a>
 
     </div>
 </div>
+
 @endsection

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Database\Seeders;
 
-use Illuminate\Http\Request;
+use Illuminate\Database\Seeder;
+use App\Models\Product;
 
-class ProductController extends Controller
+class ProductSeeder extends Seeder
 {
-    //  Centralized product data
-public function allProducts()
+    public function run()
     {
-        return [
+        $products = [
             //  Chocolates
             [
                 'slug' => 'luxury-chocolate-box',
@@ -149,50 +149,10 @@ public function allProducts()
                 'description' => 'Elegant mug packed in a premium gift box.'
             ],
         ];
-    }
 
-    //  Product listing page
-    public function indexFrontend(Request $request)
-{
-    $category = $request->query('category');
-    $query = $request->query('query');
-    $allProducts = $this->allProducts();
-
-    //  Filter by category first (if provided)
-    if ($category) {
-        $filtered = array_filter($allProducts, fn($p) => $p['category'] === $category);
-    } else {
-        $filtered = $allProducts;
-    }
-
-    //  Then filter by search keyword 
-    if ($query) {
-        $query = strtolower($query);
-        $filtered = array_filter($filtered, function ($p) use ($query) {
-            return str_contains(strtolower($p['name']), $query)
-                || str_contains(strtolower($p['description']), $query)
-                || str_contains(strtolower($p['category']), $query);
-        });
-    }
-
-    return view('pages.products', [
-        'products' => array_values($filtered),
-        'category' => $category,
-        'query' => $query,
-    ]);
-}
-
-
-    //  Single product detail page
-    public function showFrontend($slug)
-    {
-        $allProducts = $this->allProducts();
-        $product = collect($allProducts)->firstWhere('slug', $slug);
-
-        if (!$product) {
-            abort(404);
+        // Insert each product into database
+        foreach ($products as $product) {
+            Product::create($product);
         }
-
-        return view('pages.product_details', compact('product'));
-}
+    }
 }

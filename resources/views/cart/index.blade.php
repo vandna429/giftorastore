@@ -3,13 +3,25 @@
 @section('title', 'Your Cart')
 
 @section('content')
-<div class="container py-5">
-    <h2>Your Shopping Cart</h2>
 
-    @if(session('cart') && count(session('cart')) > 0)
+
+
+<div class="container py-5">
+    <h2 class="fw-bold mb-4"> Your Shopping Cart</h2>
+
+    {{-- Success & Error Alerts --}}
+    @if(session('success'))
+        <div class="alert alert-success text-center">{{ session('success') }}</div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger text-center">{{ session('error') }}</div>
+    @endif
+
+    @if(!empty($cart) && count($cart) > 0)
         <table class="table table-bordered align-middle">
             <thead class="table-light">
-                <tr>
+                <tr class="text-center">
                     <th>Product</th>
                     <th>Price (PKR)</th>
                     <th>Quantity</th>
@@ -19,53 +31,66 @@
             </thead>
             <tbody>
                 @php $total = 0; @endphp
-                @foreach($cart as $id => $item)
+                @foreach($cart as $slug => $item)
                     @php 
                         $subtotal = $item['price'] * $item['quantity']; 
                         $total += $subtotal;
                     @endphp
                     <tr>
-                        <td>{{ $item['name'] }}</td>
-                        <td>{{ number_format($item['price']) }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="{{ asset('images/' . $item['image']) }}" 
+                                     alt="{{ $item['name'] }}" 
+                                     width="60" class="rounded shadow-sm">
+                                <span class="fw-semibold">{{ $item['name'] }}</span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">{{ number_format($item['price']) }}</td>
+
                         <td class="text-center">
-                            <!-- Quantity controls -->
                             <div class="d-flex justify-content-center align-items-center gap-2">
                                 <!-- Decrease -->
-                                <form action="{{ route('cart.update', $id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('cart.update', $slug) }}" method="POST" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="action" value="decrease">
-                                    <button class="btn btn-sm btn-outline-secondary">-</button>
+                                    <button class="btn btn-sm btn-outline-secondary">−</button>
                                 </form>
 
                                 <span class="fw-bold">{{ $item['quantity'] }}</span>
 
                                 <!-- Increase -->
-                                <form action="{{ route('cart.update', $id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('cart.update', $slug) }}" method="POST" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="action" value="increase">
                                     <button class="btn btn-sm btn-outline-secondary">+</button>
                                 </form>
                             </div>
                         </td>
-                        <td>{{ number_format($subtotal) }}</td>
-                        <td>
-                            <form method="POST" action="{{ route('cart.remove', $id) }}">
-                                @csrf
-                                <button class="btn btn-danger btn-sm">Remove</button>
-                            </form>
+
+                        <td class="text-center">{{ number_format($subtotal) }}</td>
+
+                        <td class="text-center">
+                            <a href="{{ route('cart.remove', $slug) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Remove this item?');">
+                                Remove
+                            </a>
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <h4 class="text-end">Total: <span class="text-primary">PKR {{ number_format($total) }}</span></h4>
+        <h4 class="text-end mt-4">
+            <strong>Total:</strong> 
+            <span class="text-primary">PKR {{ number_format($total) }}</span>
+        </h4>
 
         <div class="d-flex justify-content-between mt-4">
-            <form method="POST" action="{{ route('cart.clear') }}">
-                @csrf
-                <button class="btn btn-outline-danger">Clear Cart</button>
-            </form>
+            <a href="{{ route('cart.clear') }}" class="btn btn-outline-danger">
+                 Clear Cart
+            </a>
 
             <a href="{{ route('cart.checkout') }}" class="btn btn-success">
                 Proceed to Checkout →
@@ -73,7 +98,12 @@
         </div>
 
     @else
-        <p>Your cart is empty. <a href="{{ route('products.index') }}">Shop now</a></p>
+        <div class="text-center py-5">
+            <p class="fs-5"> Your cart is empty.</p>
+            <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">
+                Browse Products
+            </a>
+        </div>
     @endif
 </div>
 @endsection

@@ -15,30 +15,28 @@
 
     @php
         $cart = session('cart', []);
-        $total = 0;
-        foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
+        $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
     @endphp
 
-    {{-- ✅ Show empty cart message only when no success message --}}
+    {{-- ✅ Show empty cart message (only if no success) --}}
     @if(count($cart) == 0 && !session('success'))
         <div class="alert alert-warning text-center">
-            Your cart is empty. <a href="{{ route('products.index') }}">Browse products</a>
+            🛒 Your cart is empty. 
+            <a href="{{ route('products.index') }}" class="fw-semibold text-decoration-none">Browse products</a>
         </div>
     @endif
 
     @if(count($cart) > 0)
-        <div class="row g-5">
+        <div class="row g-5 mt-4">
             <!-- 🛒 Cart Summary -->
             <div class="col-md-6">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm border-0">
                     <div class="card-header bg-primary text-white fw-semibold">
                         Your Order Summary
                     </div>
                     <div class="card-body">
                         @foreach($cart as $item)
-                            <div class="d-flex justify-content-between mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span>{{ $item['name'] }} (x{{ $item['quantity'] }})</span>
                                 <span>PKR {{ number_format($item['price'] * $item['quantity']) }}</span>
                             </div>
@@ -51,12 +49,12 @@
 
             <!-- 👤 Customer Details -->
             <div class="col-md-6">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm border-0">
                     <div class="card-header bg-success text-white fw-semibold">
                         Customer Information
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('checkout.process') }}" method="POST">
+                        <form action="{{ route('cart.processCheckout') }}" method="POST">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Full Name</label>
