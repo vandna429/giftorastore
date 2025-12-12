@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Order;
+use App\Http\Controllers\ProductController;
 
 class CartController extends Controller
 {
-    //  Show cart
+    // Show cart
     public function index()
     {
         $cart = session()->get('cart', []);
@@ -14,10 +16,9 @@ class CartController extends Controller
         return view('cart.index', compact('cart', 'total'));
     }
 
-    //  Add product to cart
+    // Add product to cart
     public function add(Request $request, $slug)
     {
-        //  Get all products from ProductController
         $products = (new ProductController())->allProducts();
         $product = collect($products)->firstWhere('slug', $slug);
 
@@ -42,11 +43,10 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', '✅ Product added to cart!');
     }
 
-    // 🔼 Update quantity (increase/decrease)
+    // Update quantity
     public function update(Request $request, $slug)
     {
         $cart = session()->get('cart', []);
-
         if (!isset($cart[$slug])) {
             return redirect()->back()->with('error', 'Item not found in cart!');
         }
@@ -64,7 +64,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Cart updated!');
     }
 
-    // ❌ Remove one item
+    // Remove one item
     public function remove($slug)
     {
         $cart = session()->get('cart', []);
@@ -75,14 +75,14 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Item removed!');
     }
 
-    // 🧹 Clear all
+    // Clear all
     public function clear()
     {
         session()->forget('cart');
         return redirect()->back()->with('success', 'Cart cleared!');
     }
 
-    // 💳 Checkout page
+    // Checkout page
     public function checkout()
     {
         $cart = session()->get('cart', []);
@@ -90,16 +90,37 @@ class CartController extends Controller
         return view('cart.checkout', compact('cart', 'total'));
     }
 
-    // ✅ Fake checkout process
+    // Process checkout and save order
     public function processCheckout(Request $request)
     {
+        $cart = session()->get('cart', []);
+        if (empty($cart)) {
+            return redirect()->back()->with('error', 'Cart is empty!');
+        }
+
         $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email',
+            'phone' => 'required|string|max:20',
+            'email' => 'required|email|max:255',
             'address' => 'required|string|max:255',
         ]);
 
+        // Calculate total price
+        $total = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+
+        // Save order in database
+        Order::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'address' => $request->address,
+            'total_price' => $total,
+            'status' => 'Pending',
+        ]);
+
+        // Clear cart
         session()->forget('cart');
+
         return redirect()->route('cart.checkout')->with('success', '🎉 Order placed successfully!');
     }
 }

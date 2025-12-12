@@ -19,12 +19,21 @@
         <li class="nav-item"><a class="nav-link" href="{{ route('about') }}">About</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
 
-        {{-- Admin Login --}}
+        <!-- {{-- Admin Login / Logout --}}
         <li class="nav-item ms-3">
-          <a class="btn btn-outline-secondary" href="{{ route('admin.login') }}">
-            <i class="bi bi-person"></i> Admin Login
-          </a>
-        </li>
+          @if(session('admin_logged_in'))
+              <form action="{{ route('admin.logout') }}" method="POST" class="d-inline">
+                  @csrf
+                  <button type="submit" class="btn btn-outline-danger">
+                      <i class="bi bi-box-arrow-right"></i> Logout
+                  </button>
+              </form>
+          @else
+              <a class="btn btn-outline-secondary" href="{{ route('admin.login') }}">
+                  <i class="bi bi-person"></i> Admin Login
+              </a>
+          @endif
+        </li> -->
 
         {{-- Cart Icon --}}
         @php

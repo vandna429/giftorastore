@@ -12,8 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('slug')->unique()->after('id');
-            $table->string('category')->after('price');
+            // Add slug if it does not exist
+            if (!Schema::hasColumn('products', 'slug')) {
+                $table->string('slug')->unique()->after('id');
+            }
+
+            // Add category if it does not exist
+            if (!Schema::hasColumn('products', 'category')) {
+                $table->string('category')->nullable()->after('price');
+            }
         });
     }
 
@@ -23,7 +30,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['slug', 'category']);
+            if (Schema::hasColumn('products', 'slug')) {
+                $table->dropColumn('slug');
+            }
+            if (Schema::hasColumn('products', 'category')) {
+                $table->dropColumn('category');
+            }
         });
     }
 };

@@ -22,7 +22,14 @@
 
         <!--  Product Image -->
         <div class="col-md-6 text-center">
-            <img src="{{ asset('images/' . $product['image']) }}" 
+            @php
+                $imagePath = $product['image'];
+                // If image path does not contain '/', assume old image in public/images/
+                if (!str_contains($imagePath, '/')) {
+                    $imagePath = 'images/' . $imagePath;
+                }
+            @endphp
+            <img src="{{ asset($imagePath) }}" 
                  alt="{{ $product['name'] }}" 
                  class="img-fluid rounded shadow-sm" 
                  style="max-height: 420px; object-fit: contain;">
@@ -46,10 +53,10 @@
             </form>
 
             <!--  Back Button -->
-            <a href="{{ route('products.index', ['category' => $product['category']]) }}" 
-               class="btn btn-outline-secondary mt-3 ms-2">
-                ← Back to {{ ucfirst($product['category']) }}
+            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                &larr; Back to Products
             </a>
+
         </div>
     </div>
 </div>

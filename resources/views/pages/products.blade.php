@@ -5,7 +5,7 @@
 @section('content')
 <div class="py-5 container">
 
-    <!-- 🔍 Search Bar -->
+    <!-- 🔍 Title + Live Search -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h2 class="fw-bold mb-0">
             @if(request('category'))
@@ -14,12 +14,17 @@
                 All Products
             @endif
         </h2>
-        <form class="d-flex" method="GET" action="{{ route('products.index') }}">
-            <input name="query" class="form-control me-2" type="search"
-                   placeholder="Search products" aria-label="Search"
-                   value="{{ request('query') }}">
-            <button class="btn btn-outline-secondary" type="submit">Search</button>
-        </form>
+
+        <!-- 🔍 ONLY LIVE AJAX SEARCH BAR -->
+        <div class="position-relative" style="width: 250px;">
+            <input type="text" id="liveSearch" class="form-control" placeholder="Search by name or category...">
+
+            <!-- Live Dropdown -->
+            <div id="searchResults"
+                class="list-group position-absolute w-100 shadow-sm"
+                style="max-height: 250px; overflow-y: auto; display: none; z-index: 999;">
+            </div>
+        </div>
     </div>
 
     <!-- 🟩 Category Filter Buttons -->
@@ -36,7 +41,13 @@
         @forelse($products as $product)
         <div class="col-sm-6 col-md-4 col-lg-3">
             <div class="card h-100 shadow-sm border-0">
-                <img src="{{ asset('images/' . $product['image']) }}"
+                @php
+                    $imagePath = $product['image'];
+                    if (!str_contains($imagePath, '/')) {
+                        $imagePath = 'images/' . $imagePath;
+                    }
+                @endphp
+                <img src="{{ asset($imagePath) }}"
                      class="card-img-top" alt="{{ $product['name'] }}"
                      style="height: 200px; object-fit: contain; background: #f8f9fa;">
 
@@ -46,9 +57,7 @@
 
                     <div class="mt-auto d-flex justify-content-between align-items-center">
                         <strong>PKR {{ number_format($product['price']) }}</strong>
-                        <a href="{{ route('products.show', $product['slug']) }}" class="btn btn-sm btn-primary">
-                            View
-                        </a>
+                        <a href="{{ route('products.show', $product['slug']) }}" class="btn btn-sm btn-primary">View</a>
                     </div>
                 </div>
             </div>
@@ -60,4 +69,42 @@
         @endforelse
     </div>
 </div>
+
+<!-- 🔁 AJAX Live Search Script -->
+<script>
+document.getElementById('liveSearch').addEventListener('keyup', function () {
+    let query = this.value;
+
+    if (query.length < 1) {
+        document.getElementById('searchResults').style.display = "none";
+        document.getElementById('searchResults').innerHTML = "";
+        return;
+    }
+
+    fetch("{{ route('products.liveSearch') }}?query=" + query)
+        .then(res => res.json())
+        .then(data => {
+            let resultsBox = document.getElementById('searchResults');
+
+            if (data.length > 0) {
+                let html = "";
+                data.forEach(item => {
+                    html += `
+                        <a href="/products/${item.slug}" class="list-group-item list-group-item-action">
+                            <strong>${item.name}</strong><br>
+                            <small class="text-muted">${item.category_name}</small>
+                        </a>
+                    `;
+                });
+                resultsBox.innerHTML = html;
+                resultsBox.style.display = "block";
+            } else {
+                resultsBox.innerHTML = `<div class="list-group-item">No results found</div>`;
+                resultsBox.style.display = "block";
+            }
+        });
+});
+</script>
+
+
 @endsection

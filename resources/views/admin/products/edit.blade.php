@@ -35,10 +35,18 @@
             <input type="number" name="price" class="form-control" value="{{ $product->price }}" required>
         </div>
 
-        <div class="mb-3">
-            <label>Category:</label>
-            <input type="text" name="category" class="form-control" value="{{ $product->category }}" required>
-        </div>
+       <div class="mb-3">
+    <label>Category:</label>
+    <select name="category_id" class="form-control" required>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}"
+                {{ $product->category_id == $category->id ? 'selected' : '' }}>
+                {{ $category->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
 
         <div class="mb-3">
             <label>Image:</label>

@@ -18,7 +18,8 @@ class ProductController extends Controller
     // Show form to create product
     public function create()
     {
-        return view('admin.products.create');
+        $categories = \App\Models\Category::all();
+        return view('admin.products.create', compact('categories'));
     }
 
     // Store new product
@@ -27,14 +28,15 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required|numeric',
-            'category' => 'required|string',
-            'image' => 'image',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $imageName = null;
+        $imagePath = null;
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);
+            $imagePath = 'uploads/products/' . $imageName; // store full relative path
         }
 
         $slug = \Str::slug($request->name) . '-' . time();
@@ -44,8 +46,8 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
-            'category' => $request->category,
-            'image' => $imageName,
+            'category_id' => $request->category_id,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('admin.products.index');
@@ -55,7 +57,8 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail($id);
-        return view('admin.products.edit', compact('product'));
+        $categories = \App\Models\Category::all();
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     // Update product
@@ -66,14 +69,15 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required|numeric',
-            'category' => 'required|string',
-            'image' => 'image',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $imageName = $product->image;
+        $imagePath = $product->image; // keep existing image by default
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);
+            $imagePath = 'uploads/products/' . $imageName; // store full relative path
         }
 
         $slug = \Str::slug($request->name) . '-' . time();
@@ -83,8 +87,8 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
-            'category' => $request->category,
-            'image' => $imageName,
+            'category_id' => $request->category_id,
+            'image' => $imagePath,
         ]);
 
         return redirect()->route('admin.products.index');
