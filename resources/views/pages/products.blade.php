@@ -30,10 +30,12 @@
     <!-- 🟩 Category Filter Buttons -->
     <div class="mb-4 text-center">
         <a href="{{ route('products.index') }}" class="btn btn-outline-primary btn-sm mx-1 {{ !request('category') ? 'active' : '' }}">All</a>
-        <a href="{{ route('products.index', ['category' => 'chocolates']) }}" class="btn btn-outline-primary btn-sm mx-1 {{ request('category') == 'chocolates' ? 'active' : '' }}">Chocolates</a>
-        <a href="{{ route('products.index', ['category' => 'roses']) }}" class="btn btn-outline-primary btn-sm mx-1 {{ request('category') == 'roses' ? 'active' : '' }}">Roses</a>
-        <a href="{{ route('products.index', ['category' => 'candles']) }}" class="btn btn-outline-primary btn-sm mx-1 {{ request('category') == 'candles' ? 'active' : '' }}">Candles</a>
-        <a href="{{ route('products.index', ['category' => 'mugs']) }}" class="btn btn-outline-primary btn-sm mx-1 {{ request('category') == 'mugs' ? 'active' : '' }}">Mugs</a>
+        @foreach($categories as $category)
+            <a href="{{ route('products.index', ['category' => $category->slug]) }}" 
+               class="btn btn-outline-primary btn-sm mx-1 {{ request('category') == $category->slug ? 'active' : '' }}">
+                {{ $category->name }}
+            </a>
+        @endforeach
     </div>
 
     <!-- 🛍️ Product Cards -->

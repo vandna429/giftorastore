@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('title', 'Add Product')
 
 @section('content')
-<div class="container py-5">
-    <h2>Add New Product</h2>
+<div class="products-table p-4">
+    <h2 class="page-title mb-4">Add New Product</h2>
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -31,14 +31,19 @@
 
         <div class="mb-3">
             <label>Price:</label>
-            <input type="number" name="price" class="form-control" required>
+            <input type="text" name="price" class="form-control" pattern="[0-9]+(\.[0-9]{1,2})?" placeholder="e.g., 900 or 900.50" required>
+        </div>
+
+        <div class="mb-3">
+            <label>Stock Quantity:</label>
+            <input type="number" name="stock" class="form-control" value="0" min="0" required>
         </div>
 
         <div class="mb-3">
             <label>Category:</label>
             <select name="category_id" class="form-control" required>
                 <option value="">-- Select Category --</option>
-                @foreach(App\Models\Category::all() as $category)
+                @foreach($categories as $category)
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </select>

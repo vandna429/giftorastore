@@ -70,6 +70,11 @@ Route::prefix('admin')->group(function () {
         $request->session()->regenerateToken();
         return redirect()->route('home')->with('success', 'Logged out successfully!');
     })->name('admin.logout');
+    
+    // Fallback GET route for logout (redirects to home if accessed directly)
+    Route::get('/logout', function () {
+        return redirect()->route('home');
+    });
 
 });
 
@@ -122,6 +127,10 @@ Route::get('/dashboard', function () use ($checkAdmin) {
     Route::put('/products/{id}', function (Request $request, $id) use ($checkAdmin) {
         return $checkAdmin(fn() => app(AdminProductController::class)->update($request, $id));
     })->name('admin.products.update');
+
+    Route::put('/products/{id}/stock', function (Request $request, $id) use ($checkAdmin) {
+        return $checkAdmin(fn() => app(AdminProductController::class)->updateStock($request, $id));
+    })->name('admin.products.updateStock');
 
     Route::delete('/products/{id}', function ($id) use ($checkAdmin) {
         return $checkAdmin(fn() => app(AdminProductController::class)->destroy($id));

@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('admin.layouts.admin')
 
 @section('title', 'Orders')
 
 @section('content')
-<div class="container py-5">
-    <h2 class="mb-4">All Orders</h2>
+<div>
+    <h1 class="page-title mb-4">Orders</h1>
 
     {{-- Success & Error Messages --}}
     @if(session('success'))
@@ -16,11 +16,13 @@
     @endif
 
     @if($orders->count() > 0)
-        <table class="table table-bordered align-middle">
+        <div class="products-table">
+            <table class="table table-hover mb-0">
             <thead class="table-light text-center">
                 <tr>
                     <th>Order ID</th>
                     <th>Customer</th>
+                    <th>Address</th>
                     <th>Total Price</th>
                     <th>Status</th>
                     <th>Placed At</th>
@@ -31,7 +33,18 @@
                 @foreach($orders as $order)
                 <tr class="text-center">
                     <td>{{ $order->id }}</td>
-                    <td>{{ $order->user?->name ?? 'Guest' }}</td>
+                    <td>{{ $order->name ?? $order->user?->name ?? 'Guest' }}</td>
+                    <td class="text-start">
+                        <small>
+                            {{ $order->address ?? 'N/A' }}<br>
+                            @if($order->phone)
+                                <span class="text-muted"><i class="bi bi-telephone"></i> {{ $order->phone }}</span>
+                            @endif
+                            @if($order->email)
+                                <br><span class="text-muted"><i class="bi bi-envelope"></i> {{ $order->email }}</span>
+                            @endif
+                        </small>
+                    </td>
                     <td>PKR {{ number_format($order->total_price, 2) }}</td>
                     <td>
                         <span class="badge 
@@ -63,7 +76,8 @@
                 </tr>
                 @endforeach
             </tbody>
-        </table>
+            </table>
+        </div>
     @else
         <div class="text-center py-5">
             <p class="fs-5">No orders found.</p>

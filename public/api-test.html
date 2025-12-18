@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .endpoint h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .success {
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            border-left: 4px solid #dc3545;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 API Testing Page</h1>
+        
+        <div class="info">
+            <strong>Base URL:</strong> <code id="baseUrl"></code><br>
+            <strong>Current Page:</strong> <code id="currentPage"></code>
+        </div>
+
+        <div class="endpoint">
+            <h3>1. Products API - List All</h3>
+            <p><code>GET /api/products</code></p>
+            <button onclick="testEndpoint('/api/products', 'products')">Test Endpoint</button>
+            <div id="products" class="response" style="display:none;"></div>
+        </div>
+
+        <div class="endpoint">
+            <h3>2. Products API - With Pagination</h3>
+            <p><code>GET /api/products?per_page=5</code></p>
+            <button onclick="testEndpoint('/api/products?per_page=5', 'products-paginated')">Test Endpoint</button>
+            <div id="products-paginated" class="response" style="display:none;"></div>
+        </div>
+
+        <div class="endpoint">
+            <h3>3. Categories API - List All</h3>
+            <p><code>GET /api/categories</code></p>
+            <button onclick="testEndpoint('/api/categories', 'categories')">Test Endpoint</button>
+            <div id="categories" class="response" style="display:none;"></div>
+        </div>
+
+        <div class="endpoint">
+            <h3>4. Orders API - List All</h3>
+            <p><code>GET /api/orders</code></p>
+            <button onclick="testEndpoint('/api/orders', 'orders')">Test Endpoint</button>
+            <div id="orders" class="response" style="display:none;"></div>
+        </div>
+
+        <div class="endpoint">
+            <h3>5. Test All Endpoints</h3>
+            <button onclick="testAll()" style="background: #28a745;">Test All</button>
+        </div>
+    </div>
+
+    <script>
+        // Get base URL
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '');
+        document.getElementById('baseUrl').textContent = baseUrl + '/api';
+        document.getElementById('currentPage').textContent = window.location.href;
+
+        async function testEndpoint(endpoint, elementId) {
+            const responseDiv = document.getElementById(elementId);
+            responseDiv.style.display = 'block';
+            responseDiv.className = 'response';
+            responseDiv.textContent = 'Loading...';
+
+            try {
+                const url = baseUrl + endpoint;
+                console.log('Testing:', url);
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                responseDiv.className = response.ok ? 'response success' : 'response error';
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDiv.className = 'response error';
+                responseDiv.textContent = 'Error: ' + error.message + '\n\nMake sure:\n1. XAMPP Apache is running\n2. The URL path is correct\n3. Database is connected';
+            }
+        }
+
+        async function testAll() {
+            const endpoints = [
+                { path: '/api/products', id: 'products' },
+                { path: '/api/categories', id: 'categories' },
+                { path: '/api/orders', id: 'orders' }
+            ];
+
+            for (const endpoint of endpoints) {
+                await testEndpoint(endpoint.path, endpoint.id);
+                await new Promise(resolve => setTimeout(resolve, 500)); // Small delay between requests
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background: linear-gradient(135deg, #F4B6C2 0%, #D16C8A 100%);">
   <div class="container">
     {{-- Logo --}}
     <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ route('home') }}">
       <img src="{{ asset('images/logo-pink.png') }}" alt="Giftora Logo" height="40" class="me-2">
-      <span>Giftora</span>
+      <span class="text-white fw-bold">Giftora</span>
     </a>
 
     {{-- Mobile Toggle --}}
@@ -14,10 +14,10 @@
     {{-- Navigation Links --}}
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-center">
-        <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('products.index') }}">Products</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('about') }}">About</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{{ route('home') }}">Home</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{{ route('products.index') }}">Products</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{{ route('about') }}">About</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="{{ route('contact') }}">Contact</a></li>
 
         <!-- {{-- Admin Login / Logout --}}
         <li class="nav-item ms-3">
@@ -41,7 +41,7 @@
           $totalQty = collect($cart)->sum('quantity');
         @endphp
         <li class="nav-item ms-3">
-          <button class="btn btn-outline-primary position-relative" 
+          <button class="btn btn-outline-light position-relative" 
                   type="button" data-bs-toggle="offcanvas" 
                   data-bs-target="#cartSidebar" aria-controls="cartSidebar">
             <i class="bi bi-cart3 fs-5"></i>
@@ -61,7 +61,7 @@
 <div class="offcanvas offcanvas-end" tabindex="-1" id="cartSidebar" aria-labelledby="cartSidebarLabel">
   <div class="offcanvas-header border-bottom">
     <h5 class="offcanvas-title" id="cartSidebarLabel">
-      <i class="bi bi-cart3 me-2 text-primary"></i>Your Cart
+      <i class="bi bi-cart3 me-2 text-white"></i>Your Cart
     </h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
@@ -72,7 +72,14 @@
         @foreach($cart as $slug => $item)
           <li class="list-group-item d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-              <img src="{{ asset('images/' . $item['image']) }}" alt="{{ $item['name'] }}" width="50" class="rounded me-2 shadow-sm">
+              @php
+                $imagePath = $item['image'];
+                // If image path does not contain '/', assume old image in public/images/
+                if (!str_contains($imagePath, '/')) {
+                    $imagePath = 'images/' . $imagePath;
+                }
+              @endphp
+              <img src="{{ asset($imagePath) }}" alt="{{ $item['name'] }}" width="50" class="rounded me-2 shadow-sm">
               <div>
                 <strong>{{ $item['name'] }}</strong><br>
                 <small class="text-muted">Qty: {{ $item['quantity'] }}</small>
@@ -90,11 +97,11 @@
         $cartTotal = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
       @endphp
       <div class="mb-3 text-end">
-        <h6>Total: <span class="text-primary fw-bold">PKR {{ number_format($cartTotal) }}</span></h6>
+        <h6>Total: <span class="fw-bold text-primary">PKR {{ number_format($cartTotal) }}</span></h6>
       </div>
 
       <div class="d-grid gap-2">
-        <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">
+        <a href="{{ route('cart.index') }}" class="btn btn-primary" style="border-radius: 8px;">
           <i class="bi bi-bag me-1"></i> View Full Cart
         </a>
         <a href="{{ route('cart.checkout') }}" class="btn btn-success">

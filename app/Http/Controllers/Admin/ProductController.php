@@ -28,6 +28,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required|numeric',
+            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -46,6 +47,7 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
+            'stock' => $request->stock ?? 0,
             'category_id' => $request->category_id,
             'image' => $imagePath,
         ]);
@@ -69,6 +71,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required|numeric',
+            'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -87,11 +90,42 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $request->description,
             'price' => $request->price,
+            'stock' => $request->stock ?? 0,
             'category_id' => $request->category_id,
             'image' => $imagePath,
         ]);
 
         return redirect()->route('admin.products.index');
+    }
+
+    // Update stock quantity
+    public function updateStock(Request $request, $id)
+    {
+        $request->validate([
+            'stock' => 'required|integer|min:0',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $oldStock = $product->stock;
+        $product->stock = $request->stock;
+        $product->save();
+
+        // Return JSON response for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock quantity updated successfully',
+                'data' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'old_stock' => $oldStock,
+                    'new_stock' => $product->stock,
+                ],
+            ]);
+        }
+
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Stock quantity updated successfully');
     }
 
     // Delete product

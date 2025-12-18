@@ -156,56 +156,7 @@ public function allProducts()
 
    
 
-// public function indexFrontend(Request $request)
-// {
-//     $categorySlug = $request->query('category'); // roses / chocolates / candles / mugs
-//     $query = $request->query('query');
 
-//     // 1. STATIC PRODUCTS
-//     $staticProducts = collect($this->allProducts());
-
-//     if ($categorySlug) {
-//         $staticProducts = $staticProducts->where('category', $categorySlug);
-//     }
-
-//     if ($query) {
-//         $staticProducts = $staticProducts->filter(function ($product) use ($query) {
-//             return str_contains(strtolower($product['name']), strtolower($query)) ||
-//                    str_contains(strtolower($product['description']), strtolower($query));
-//         });
-//     }
-
-//     // 2. DATABASE PRODUCTS
-//     $dbProducts = Product::with('category');
-
-//     if ($categorySlug) {
-//         $dbProducts->whereHas('category', function ($q) use ($categorySlug) {
-//             $q->where('slug', $categorySlug);
-//         });
-//     }
-
-//     if ($query) {
-//         $dbProducts->where(function ($q) use ($query) {
-//             $q->where('name', 'like', "%$query%")
-//                 ->orWhere('description', 'like', "%$query%");
-//         });
-//     }
-
-//     $dbProducts = $dbProducts->get();
-
-//     // MERGE BOTH STATIC + DB PRODUCTS
-//     $products = $dbProducts;
-
-//     // All categories list for buttons
-//     $categories = Category::all();
-
-//     return view('pages.products', [
-//         'products' => $products,
-//         'categories' => $categories,
-//         'categorySlug' => $categorySlug,
-//         'query' => $query,
-//     ]);
-// }
 
 public function indexFrontend(Request $request)
 {
@@ -223,12 +174,12 @@ public function indexFrontend(Request $request)
     }
 
     // Search filter
-    if ($query) {
-        $dbProducts->where(function ($q) use ($query) {
-            $q->where('name', 'like', "%$query%")
-              ->orWhere('description', 'like', "%$query%");
-        });
-    }
+    // if ($query) {
+    //     $dbProducts->where(function ($q) use ($query) {
+    //         $q->where('name', 'like', "%$query%")
+    //           ->orWhere('description', 'like', "%$query%");
+    //     });
+    // }
 
     $dbProducts = $dbProducts->get();
 
@@ -266,60 +217,33 @@ public function indexFrontend(Request $request)
     ]);
 }
 
-// public function showFrontend($slug)
-// {
-//     // 1. STATIC PRODUCTS
-//     // $staticProducts = collect($this->allProducts());
-//     // $product = $staticProducts->firstWhere('slug', $slug);
 
-//     if (!$product) {
-//         // 2. DATABASE PRODUCT
-//         $dbProduct = Product::where('slug', $slug)->first();
-
-//         if ($dbProduct) {
-//             return view('pages.product_details', [
-//                 'product' => [
-//                     'slug' => $dbProduct->slug,
-//                     'name' => $dbProduct->name,
-//                     'price' => $dbProduct->price,
-//                     'category' => $dbProduct->category->name,
-//                     'image' => $dbProduct->image,
-//                     'description' => $dbProduct->description,
-//                 ]
-//             ]);
-//         }
-
-//         abort(404);
-//     }
-
-//     return view('pages.product_details', compact('product'));
-
-
-// }
 
 public function showFrontend($slug)
 {
     // 1. Try to get product from static data (optional)
-    // $staticProducts = collect($this->allProducts());
-    // $product = $staticProducts->firstWhere('slug', $slug);
+    $staticProducts = collect($this->allProducts());
+    $product = $staticProducts->firstWhere('slug', $slug);
 
     // 2. If not found in static, get from database
-    $dbProduct = Product::where('slug', $slug)->first();
+    if (!$product) {
+        $dbProduct = Product::with('category')->where('slug', $slug)->first();
 
-    if (!$dbProduct) {
-        // Product not found in DB either
-        abort(404, 'Product not found');
+        if (!$dbProduct) {
+            // Product not found in DB either
+            abort(404, 'Product not found');
+        }
+
+        // Prepare product data from database
+        $product = [
+            'slug' => $dbProduct->slug,
+            'name' => $dbProduct->name,
+            'price' => $dbProduct->price,
+            'category' => $dbProduct->category ? $dbProduct->category->name : 'Uncategorized',
+            'image' => $dbProduct->image,
+            'description' => $dbProduct->description,
+        ];
     }
-
-    // Prepare product data
-    $product = [
-        'slug' => $dbProduct->slug,
-        'name' => $dbProduct->name,
-        'price' => $dbProduct->price,
-        'category' => $dbProduct->category->name,
-        'image' => $dbProduct->image,
-        'description' => $dbProduct->description,
-    ];
 
     // Return view with product
     return view('pages.product_details', compact('product'));

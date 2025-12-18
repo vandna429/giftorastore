@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background: linear-gradient(135deg, #e8d5ff 0%, #f5c2e8 100%);">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="{{ route('admin.dashboard') }}">
+        <a class="navbar-brand text-white" href="{{ route('admin.dashboard') }}">
             Admin Panel
         </a>
 
@@ -13,14 +13,14 @@
             <ul class="navbar-nav me-auto">
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                    <a class="nav-link text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
                        href="{{ route('admin.dashboard') }}">
                         Dashboard
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('admin/products*') ? 'active' : '' }}"
+                    <a class="nav-link text-white {{ request()->is('admin/products*') ? 'active' : '' }}"
                        href="{{ route('admin.products.index') }}">
                         Products
                     </a>
@@ -28,14 +28,14 @@
 
                 <!-- ✅ Categories Link -->
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('admin/categories*') ? 'active' : '' }}"
+                    <a class="nav-link text-white {{ request()->is('admin/categories*') ? 'active' : '' }}"
                        href="{{ route('admin.categories.index') }}">
                         Categories
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('admin/orders*') ? 'active' : '' }}"
+                    <a class="nav-link text-white {{ request()->is('admin/orders*') ? 'active' : '' }}"
                        href="{{ route('admin.orders.index') }}">
                         Orders
                     </a>

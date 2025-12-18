@@ -39,7 +39,14 @@
                     <tr>
                         <td>
                             <div class="d-flex align-items-center gap-3">
-                                <img src="{{ asset('images/' . $item['image']) }}" 
+                                @php
+                                    $imagePath = $item['image'];
+                                    // If image path does not contain '/', assume old image in public/images/
+                                    if (!str_contains($imagePath, '/')) {
+                                        $imagePath = 'images/' . $imagePath;
+                                    }
+                                @endphp
+                                <img src="{{ asset($imagePath) }}" 
                                      alt="{{ $item['name'] }}" 
                                      width="60" class="rounded shadow-sm">
                                 <span class="fw-semibold">{{ $item['name'] }}</span>
@@ -71,11 +78,13 @@
                         <td class="text-center">{{ number_format($subtotal) }}</td>
 
                         <td class="text-center">
-                            <a href="{{ route('cart.remove', $slug) }}" 
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Remove this item?');">
-                                Remove
-                            </a>
+                            <form action="{{ route('cart.remove', $slug) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-sm" 
+                                        onclick="return confirm('Remove this item?');">
+                                    Remove
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

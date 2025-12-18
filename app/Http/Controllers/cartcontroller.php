@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Product;
 use App\Http\Controllers\ProductController;
 
 class CartController extends Controller
@@ -19,11 +20,25 @@ class CartController extends Controller
     // Add product to cart
     public function add(Request $request, $slug)
     {
+        // First, try to get product from static array
         $products = (new ProductController())->allProducts();
         $product = collect($products)->firstWhere('slug', $slug);
 
+        // If not found in static, check database
         if (!$product) {
-            return redirect()->back()->with('error', 'Product not found!');
+            $dbProduct = Product::where('slug', $slug)->first();
+            
+            if (!$dbProduct) {
+                return redirect()->back()->with('error', 'Product not found!');
+            }
+
+            // Convert database product to array format
+            $product = [
+                'name' => $dbProduct->name,
+                'price' => $dbProduct->price,
+                'image' => $dbProduct->image,
+                'slug' => $dbProduct->slug,
+            ];
         }
 
         $cart = session()->get('cart', []);
