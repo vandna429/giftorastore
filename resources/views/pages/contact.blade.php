@@ -163,12 +163,31 @@
       <p>Have a question or need help? Fill out the form and we'll get back to you as soon as possible.</p>
     </div>
 
+    @if(session('success'))
+      <div class="alert alert-success alert-dismissible fade show" role="alert" style="max-width: 800px; margin: 0 auto 30px;">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+
+    @if($errors->any())
+      <div class="alert alert-danger alert-dismissible fade show" role="alert" style="max-width: 800px; margin: 0 auto 30px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <ul class="mb-0">
+          @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    @endif
+
     <!-- Contact Form and Info Cards -->
     <div class="row g-4 align-items-stretch">
       <!-- Contact Form Card -->
       <div class="col-lg-7">
         <div class="contact-form-card">
-          <form action="#" method="POST">
+          <form action="{{ route('contact.submit') }}" method="POST">
             @csrf
             <div class="mb-4">
               <label for="name" class="form-label">Name</label>

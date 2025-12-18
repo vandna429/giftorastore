@@ -25,7 +25,8 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/products', [ProductController::class, 'indexFrontend'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'showFrontend'])->name('products.show');
 
-Route::view('/contact', 'pages.contact')->name('contact');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [PageController::class, 'submitContact'])->name('contact.submit');
 Route::view('/about', 'pages.about')->name('about');
 
 /*
